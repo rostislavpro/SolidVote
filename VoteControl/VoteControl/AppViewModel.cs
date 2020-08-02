@@ -151,10 +151,24 @@ namespace VoteControl
             this.botClient = botClient;
             this.ethClient = ethClient;
 
+            this.botClient.OnMessage += BotClient_OnMessage;
+            this.botClient.OnUpdate += BotClient_OnUpdate;
+            this.botClient.StartReceiving();
+
             this.VotingExpires = DateTime.Now;
-            this.ControlAddress = "1f911378af8d5ab2bf5868e1b75d84684acb58b4";
+            this.ControlAddress = "0x1f911378af8d5ab2bf5868e1b75d84684acb58b4";
 
             Task.Run(LoadCurrentVotings);
+        }
+
+        private void BotClient_OnUpdate(object sender, Telegram.Bot.Args.UpdateEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void BotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         private void StartVotingHandler()
@@ -168,7 +182,8 @@ namespace VoteControl
             var newProposal = new NewProposalMessage
             {
                 Description = this.VotingTheme,
-                Link = "https://t.me/joinchat/AAAAAEcq4OCa2bdGCmt_tg",
+                //Link = "https://t.me/joinchat/AAAAAEcq4OCa2bdGCmt_tg",
+                Link = "https://t.me/joinchat/AAAAAE_Aam-ZQ7H-6oYvhw",
                 EndDate = this.VotingExpires.Ticks,
                 Gas = 3000000
             };
@@ -181,7 +196,7 @@ namespace VoteControl
             var etherscanlink = "https://kovan.etherscan.io/address/" + CommonStuff.ContractAddress;
             var messageText = $"● *{memberData.Name}* started voting on subject `{this.VotingTheme}`.\r\nDeadline: {this.VotingExpires} \r\nETH transaction: `{transactionReceipt.TransactionHash}`\r\nEtherscan: {etherscanlink}";
 
-            var msg = botClient.SendTextMessageAsync(new Telegram.Bot.Types.ChatId(576530041),
+            var msg = botClient.SendTextMessageAsync(new Telegram.Bot.Types.ChatId(-1001338010223),
                 messageText,
                 Telegram.Bot.Types.Enums.ParseMode.Markdown,
                 true, false).Result;
@@ -337,7 +352,7 @@ namespace VoteControl
 
             using (var pdf = new MemoryStream(BuildPdf(votingInfo.Description, votersWithResults, votingIndex, (int)totalShares, overallResult)))
             {
-                var msg = botClient.SendDocumentAsync(new Telegram.Bot.Types.ChatId(-1001477965035),
+                var msg = botClient.SendDocumentAsync(new Telegram.Bot.Types.ChatId(-1001338010223),
                     new Telegram.Bot.Types.InputFiles.InputOnlineFile(pdf, "protocol.pdf"),
                     "Protocol",
                     Telegram.Bot.Types.Enums.ParseMode.Default).Result;
